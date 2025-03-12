@@ -8,12 +8,40 @@
     "timestamp": 1741732300796
   },
   {
+    "id": "1741789172980_nc6jw93oh",
+    "nome": "joeliton",
+    "pontuacao": 7,
+    "total": 7,
+    "percentual": "100",
+    "data": "12/03/2025",
+    "timestamp": 1741789172980,
+    "operacao": "multiplicacao"
+  },
+  {
+    "id": "1741789255726_0hs7uwtu7",
+    "nome": "eliza",
+    "pontuacao": 4,
+    "total": 4,
+    "percentual": "100",
+    "data": "12/03/2025",
+    "timestamp": 1741789255726,
+    "operacao": "multiplicacao"
+  },
+  {
     "nome": "6 questoes",
     "pontuacao": 5,
     "total": 6,
     "percentual": "83",
     "data": "12/03/2025",
     "timestamp": 1741782041030
+  },
+  {
+    "nome": "joeliton",
+    "pontuacao": 24,
+    "total": 29,
+    "percentual": "82.8",
+    "data": "12/03/2025",
+    "timestamp": 1741787837623
   },
   {
     "nome": "testando",
@@ -24,11 +52,21 @@
     "timestamp": 1741782207033
   },
   {
-    "nome": "joeliton",
-    "pontuacao": 6,
-    "total": 8,
-    "percentual": "75.0",
-    "data": "11/03/2025",
-    "timestamp": 1741747248885
+    "id": "1741789308956_vfmbezg4j",
+    "nome": "eliza",
+    "pontuacao": 2,
+    "total": 4,
+    "percentual": "50",
+    "data": "12/03/2025",
+    "timestamp": 1741789308956,
+    "operacao": "subtracao"
+  },
+  {
+    "nome": "eliza",
+    "pontuacao": 3,
+    "total": 7,
+    "percentual": "43",
+    "data": "12/03/2025",
+    "timestamp": 1741787260881
   }
 ]

@@ -1,0 +1,65 @@
+/* Estilos específicos para a página do aluno */
+body {
+    max-width: 800px;
+}
+
+.question {
+    font-size: 24px;
+    margin: 20px 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+.result {
+    margin: 10px 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+.correct {
+    color: #27ae60;
+}
+
+.incorrect {
+    color: #e74c3c;
+}
+
+.score {
+    font-size: 18px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.timer {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #e74c3c;
+}
+
+.operacao-info {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #3498db;
+}
+
+/* Notificação de atualização */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #27ae60;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+
+.notification.show {
+    opacity: 1;
+}

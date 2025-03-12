@@ -1,6 +1,6 @@
 {
-  "operacaoAtual": "soma",
+  "operacaoAtual": "subtracao",
   "tabuadaAtual": "random",
   "tempoLimite": 6,
-  "numeroQuestoes": 6
+  "numeroQuestoes": 4
 }

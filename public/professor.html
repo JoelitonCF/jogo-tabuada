@@ -1,4 +1,3 @@
-<!-- Arquivo: public/professor.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -6,153 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Área do Professor - Jogo da Tabuada</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-
-        .container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        h1,
-        h2,
-        h3 {
-            color: #2c3e50;
-        }
-
-        input,
-        button,
-        select {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        .action-button {
-            margin-right: 10px;
-        }
-
-        .success {
-            background-color: #27ae60;
-        }
-
-        .success:hover {
-            background-color: #219653;
-        }
-
-        .warning {
-            background-color: #f39c12;
-        }
-
-        .warning:hover {
-            background-color: #d68910;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th,
-        td {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .tab {
-            padding: 10px 15px;
-            cursor: pointer;
-            background-color: #f5f5f5;
-            border: 1px solid #ddd;
-            border-bottom: none;
-            margin-right: 5px;
-            border-radius: 5px 5px 0 0;
-        }
-
-        .tab.active {
-            background-color: white;
-            border-bottom: 1px solid white;
-            margin-bottom: -1px;
-        }
-
-        .tab-content>div {
-            display: none;
-        }
-
-        .tab-content>div.active {
-            display: block;
-        }
-
-        .config-panel {
-            background-color: #ecf0f1;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .config-status {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            display: none;
-        }
-
-        .success-msg {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .error-msg {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-    </style>
+    <!-- Adicionar Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- Estilos CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/professor.css">
 </head>
 
 <body>
@@ -208,10 +65,13 @@
                             <input type="number" id="numQuestoes" name="numQuestoes" min="1" max="50" value="10">
                         </div>
 
-
                         <button type="submit" class="success">Salvar Configurações</button>
                     </form>
                     <div id="configStatus" class="config-status"></div>
+                    
+                    <div id="connectedUsers" class="connected-users">
+                        Alunos conectados: <span id="numConnected">0</span>
+                    </div>
                 </div>
 
                 <div>
@@ -224,8 +84,10 @@
                             sistema vai gerar números aleatórios para as perguntas.</li>
                         <li><strong>Tempo limite:</strong> Define quantos segundos o aluno terá para responder cada
                             pergunta.</li>
+                        <li><strong>Número de Questões:</strong> Define quantas perguntas serão apresentadas a cada rodada.</li>
                     </ul>
                     <p>As configurações serão aplicadas para todos os alunos que acessarem o jogo após o salvamento.</p>
+                    <p><strong>Novo:</strong> As alterações nas configurações são aplicadas em tempo real para os alunos já conectados!</p>
                 </div>
             </div>
 
@@ -240,12 +102,13 @@
                             <th>Pontuação</th>
                             <th>Total</th>
                             <th>Percentual</th>
+                            <th>Operação</th>
                             <th>Data</th>
                         </tr>
                     </thead>
                     <tbody id="rankingBody">
                         <tr>
-                            <td colspan="5">Carregando...</td>
+                            <td colspan="6">Carregando...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -259,6 +122,11 @@
                     <h3>Dados Gerais</h3>
                     <div id="dadosGerais">Carregando...</div>
                 </div>
+                
+                <div>
+                    <h3>Estatísticas por Operação</h3>
+                    <div id="estatisticasOperacoes">Carregando...</div>
+                </div>
 
                 <div>
                     <h3>Desempenho por Aluno</h3>
@@ -269,11 +137,12 @@
                                 <th>Tentativas</th>
                                 <th>Média de Acertos</th>
                                 <th>Última Tentativa</th>
+                                <th>Detalhes</th>
                             </tr>
                         </thead>
                         <tbody id="relatorioAlunosBody">
                             <tr>
-                                <td colspan="4">Carregando...</td>
+                                <td colspan="5">Carregando...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -282,251 +151,8 @@
         </div>
     </div>
 
-    <script>
-        // Elementos da interface - Tabs
-        const tabs = document.querySelectorAll('.tab');
-        const tabContents = document.querySelectorAll('.tab-content > div');
-
-        // Elementos da interface - Configurações
-        const configForm = document.getElementById('configForm');
-        const operacaoSelect = document.getElementById('operacaoAtual');
-        const tabuadaSelect = document.getElementById('tabuadaAtual');
-        const tempoLimiteInput = document.getElementById('tempoLimite');
-        const numQuestoesInput = document.getElementById('numQuestoes');
-        const configStatus = document.getElementById('configStatus');
-
-        // Elementos da interface - Ranking
-        const btnExportarCSV = document.getElementById('exportarCSV');
-        const rankingBody = document.getElementById('rankingBody');
-
-        // Elementos da interface - Relatórios
-        const dadosGeraisDiv = document.getElementById('dadosGerais');
-        const relatorioAlunosBody = document.getElementById('relatorioAlunosBody');
-
-        // Event listeners
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs
-                tabs.forEach(t => t.classList.remove('active'));
-                // Add active class to clicked tab
-                tab.classList.add('active');
-
-                // Hide all tab content
-                tabContents.forEach(content => {
-                    content.classList.remove('active');
-                });
-
-                // Show the selected tab content
-                const tabId = tab.getAttribute('data-tab');
-                document.getElementById(tabId).classList.add('active');
-
-                // Carregar dados específicos da aba
-                if (tabId === 'rankingTab') {
-                    carregarRanking();
-                } else if (tabId === 'relatoriosTab') {
-                    carregarRelatorios();
-                }
-            });
-        });
-
-        // Salvar configurações
-        configForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            salvarConfiguracoes();
-        });
-
-        // Exportar CSV
-        btnExportarCSV.addEventListener('click', exportarCSV);
-
-        // Carregar configurações ao iniciar a página
-        window.addEventListener('load', function () {
-            carregarConfiguracoes();
-
-            // Carregar dados da tab ativa inicialmente
-            if (document.getElementById('rankingTab').classList.contains('active')) {
-                carregarRanking();
-            } else if (document.getElementById('relatoriosTab').classList.contains('active')) {
-                carregarRelatorios();
-            }
-        });
-
-        function carregarConfiguracoes() {
-            fetch('/api/config')
-                .then(response => response.json())
-                .then(data => {
-                    operacaoSelect.value = data.operacaoAtual;
-                    tabuadaSelect.value = data.tabuadaAtual;
-                    tempoLimiteInput.value = data.tempoLimite;
-                    numQuestoesInput.value = data.numeroQuestoes;
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar configurações:', error);
-                    mostrarMensagem('Erro ao carregar configurações do servidor.', false);
-                });
-        }
-
-        function salvarConfiguracoes() {
-            const novasConfiguracoes = {
-                operacaoAtual: operacaoSelect.value,
-                tabuadaAtual: tabuadaSelect.value,
-                tempoLimite: tempoLimiteInput.value,
-                numeroQuestoes: numQuestoesInput.value
-            };
-
-            fetch('/api/config', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(novasConfiguracoes)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        mostrarMensagem('Configurações salvas com sucesso!', true);
-                    } else {
-                        mostrarMensagem('Erro ao salvar configurações: ' + data.error, false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao salvar configurações:', error);
-                    mostrarMensagem('Erro ao comunicar com o servidor.', false);
-                });
-        }
-
-        function mostrarMensagem(mensagem, sucesso) {
-            configStatus.textContent = mensagem;
-            configStatus.className = 'config-status';
-            configStatus.classList.add(sucesso ? 'success-msg' : 'error-msg');
-            configStatus.style.display = 'block';
-
-            setTimeout(() => {
-                configStatus.style.display = 'none';
-            }, 3000);
-        }
-
-        function carregarRanking() {
-            // Limpar tabela
-            rankingBody.innerHTML = '<tr><td colspan="5">Carregando...</td></tr>';
-
-            // Carregar ranking do servidor
-            fetch('/api/ranking')
-                .then(response => response.json())
-                .then(data => {
-                    rankingBody.innerHTML = '';
-
-                    if (data.length === 0) {
-                        rankingBody.innerHTML = '<tr><td colspan="5">Nenhum registro encontrado</td></tr>';
-                        return;
-                    }
-
-                    data.forEach(item => {
-                        const row = document.createElement('tr');
-
-                        const nomeCell = document.createElement('td');
-                        nomeCell.textContent = item.nome;
-
-                        const pontuacaoCell = document.createElement('td');
-                        pontuacaoCell.textContent = item.pontuacao;
-
-                        const totalCell = document.createElement('td');
-                        totalCell.textContent = item.total;
-
-                        const percentualCell = document.createElement('td');
-                        percentualCell.textContent = `${item.percentual}%`;
-
-                        const dataCell = document.createElement('td');
-                        dataCell.textContent = item.data;
-
-                        row.appendChild(nomeCell);
-                        row.appendChild(pontuacaoCell);
-                        row.appendChild(totalCell);
-                        row.appendChild(percentualCell);
-                        row.appendChild(dataCell);
-
-                        rankingBody.appendChild(row);
-                    });
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar ranking:', error);
-                    rankingBody.innerHTML = '<tr><td colspan="5">Erro ao carregar dados</td></tr>';
-                });
-        }
-
-        function carregarRelatorios() {
-            // Limpar dados
-            dadosGeraisDiv.innerHTML = 'Carregando...';
-            relatorioAlunosBody.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
-
-            // Carregar relatórios do servidor
-            fetch('/api/relatorios')
-                .then(response => response.json())
-                .then(data => {
-                    // Exibir dados gerais
-                    const dadosGerais = data.dadosGerais;
-                    dadosGeraisDiv.innerHTML = `
-                        <table>
-                            <tr>
-                                <td><strong>Total de Alunos:</strong></td>
-                                <td>${dadosGerais.totalAlunos}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Total de Tentativas:</strong></td>
-                                <td>${dadosGerais.totalTentativas}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Média de Acertos:</strong></td>
-                                <td>${dadosGerais.mediaPercentual}%</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Total de Acertos:</strong></td>
-                                <td>${dadosGerais.totalPontos} de ${dadosGerais.totalQuestoes}</td>
-                            </tr>
-                        </table>
-                    `;
-
-                    // Exibir relatório por aluno
-                    relatorioAlunosBody.innerHTML = '';
-
-                    if (data.relatorioAlunos.length === 0) {
-                        relatorioAlunosBody.innerHTML = '<tr><td colspan="4">Nenhum registro encontrado</td></tr>';
-                        return;
-                    }
-
-                    data.relatorioAlunos.forEach(aluno => {
-                        const row = document.createElement('tr');
-
-                        const nomeCell = document.createElement('td');
-                        nomeCell.textContent = aluno.nome;
-
-                        const tentativasCell = document.createElement('td');
-                        tentativasCell.textContent = aluno.tentativas;
-
-                        const mediaCell = document.createElement('td');
-                        mediaCell.textContent = `${aluno.mediaPercentual}%`;
-
-                        const ultimaCell = document.createElement('td');
-                        ultimaCell.textContent = aluno.ultimaTentativa;
-
-                        row.appendChild(nomeCell);
-                        row.appendChild(tentativasCell);
-                        row.appendChild(mediaCell);
-                        row.appendChild(ultimaCell);
-
-                        relatorioAlunosBody.appendChild(row);
-                    });
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar relatórios:', error);
-                    dadosGeraisDiv.innerHTML = 'Erro ao carregar dados gerais';
-                    relatorioAlunosBody.innerHTML = '<tr><td colspan="4">Erro ao carregar dados</td></tr>';
-                });
-        }
-
-        function exportarCSV() {
-            window.location.href = '/api/exportar-csv';
-        }
-    </script>
+    <!-- Scripts JavaScript -->
+    <script src="/js/professor.js"></script>
 </body>
 
 </html>
