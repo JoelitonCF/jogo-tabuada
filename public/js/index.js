@@ -38,6 +38,7 @@ let numeroA = 0;
 let numeroB = 0;
 let tempoRestante = 10;
 let timerInterval = null;
+let vidas = 3;
 let configuracoes = {
     operacaoAtual: 'multiplicacao',
     tabuadaAtual: 'random',
@@ -158,6 +159,8 @@ function iniciarJogo() {
     perguntaAtual = 0;
     pontuacao = 0;
     jogoEmAndamento = true;
+    vidas = 3;
+    document.getElementById('vidas').textContent = 'Vidas: ❤️❤️❤️';
 
     telaInicio.classList.add('hidden');
     telaFim.classList.add('hidden');
@@ -278,6 +281,14 @@ function verificarResposta() {
     } else {
         feedbackDiv.textContent = `Incorreto! A resposta correta é ${perguntaCorreta}.`;
         feedbackDiv.className = 'result incorrect';
+        vidas--;
+        document.getElementById('vidas').textContent = 'Vidas: ' + '❤️'.repeat(vidas);
+
+        //encerrar o jogo se acabaram as vidas
+        if(vidas <= 0){
+            setTimeout(finalizarJogo, 1500);
+            return;
+        }
     }
 
     // Esperar um pouco para mostrar o feedback

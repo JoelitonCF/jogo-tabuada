@@ -1478,5 +1478,15 @@
     "data": "13/03/2025",
     "timestamp": 1741868147156,
     "operacao": "soma"
+  },
+  {
+    "id": "1742089906819_chdhfrdiv",
+    "nome": "joeliton",
+    "pontuacao": 0,
+    "total": 10,
+    "percentual": "0",
+    "data": "15/03/2025",
+    "timestamp": 1742089906820,
+    "operacao": "soma"
   }
 ]
